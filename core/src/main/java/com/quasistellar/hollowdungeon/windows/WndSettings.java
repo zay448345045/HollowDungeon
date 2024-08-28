@@ -42,6 +42,10 @@ import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.DeviceCompat;
 import com.watabou.utils.Random;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+
 //TODO seeing as a fair bit of this is platform-dependant, might be better to have a per-platform wndsettings
 public class WndSettings extends WndTabbed {
 
@@ -57,6 +61,9 @@ public class WndSettings extends WndTabbed {
 	private UITab ui;
 	private AudioTab audio;
 
+ private LangsTab langs;
+
+
 	private static int last_index = 0;
 
 	public WndSettings() {
@@ -70,6 +77,15 @@ public class WndSettings extends WndTabbed {
 
 		audio = new AudioTab();
 		add( audio );
+
+
+
+
+langs = new LangsTab();
+add( langs );
+
+
+
 
 		add( new IconTab(Icons.get(Icons.DISPLAY)){
 			@Override
@@ -89,6 +105,8 @@ public class WndSettings extends WndTabbed {
 			}
 		});
 
+
+
 		add( new IconTab(Icons.get(Icons.AUDIO)){
 			@Override
 			protected void select(boolean value) {
@@ -97,6 +115,47 @@ public class WndSettings extends WndTabbed {
 				if (value) last_index = 2;
 			}
 		});
+
+
+IconTab langsTab = new IconTab(Icons.get(Icons.LANGS)){
+			@Override
+			protected void select(boolean value) {
+				super.select(value);
+				langs.visible = langs.active = value;
+				if (value) last_index = 3;
+			}
+
+			@Override
+			protected void createChildren() {
+				super.createChildren();
+				switch(Messages.lang().status()){
+					case UNFINISHED:
+						icon.hardlight(1.5f, 0, 0);
+						break;
+					case UNREVIEWED:
+						icon.hardlight(1.5f, 0.75f, 0f);
+						break;
+				}
+			}
+
+		};
+		add( langsTab );
+
+		resize(width, (int)Math.ceil(height));
+
+		layoutTabs();
+
+		if (tabs.size() == 5 && last_index >= 3){
+			//input tab isn't visible
+			select(last_index-1);
+		} else {
+			select(last_index);
+		}
+
+	}
+
+
+
 
 		resize(WIDTH, HEIGHT);
 
